@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .logo h1 {
+            color: #1877f2;
+            font-size: 28px;
+        }
+        
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #1877f2;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        button {
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: #166fe5;
+        }
+        
+        .password-toggle {
+            position: relative;
+        }
+        
+        .toggle-icon {
+            position: absolute;
+            right: 10px;
+            top: 40px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .forgot-password a {
+            color: #1877f2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+        }
+        
+        .create-account {
+            text-align: center;
+        }
+        
+        .create-account a {
+            display: inline-block;
+            background-color: #42b72a;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .create-account a:hover {
+            background-color: #36a420;
+        }
+        
+        /* Responsive styles */
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .logo h1 {
+                font-size: 24px;
+            }
+            
+            h2 {
+                font-size: 18px;
+            }
+            
+            input, button {
+                padding: 10px;
+                font-size: 14px;
+            }
+            
+            .toggle-icon {
+                top: 38px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>WebApp</h1>
+        </div>
+        <h2>Log in to your account</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error" id="email-error">Please enter a valid email address</div>
+            </div>
+            
+            <div class="form-group password-toggle">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <span class="toggle-icon" id="togglePassword">👁️</span>
+                <div class="error" id="password-error">Please enter your password</div>
+            </div>
+            
+            <button type="submit">Log In</button>
+        </form>
+        
+        <div class="forgot-password">
+            <a href="#">Forgot Password?</a>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="create-account">
+            <a href="#">Create New Account</a>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function () {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁️' : '🔒';
+        });
+        
+        // Form validation
+        const form = document.getElementById('loginForm');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let isValid = true;
+            
+            // Validate email
+            const email = document.getElementById('email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email.value)) {
+                document.getElementById('email-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('email-error').style.display = 'none';
+            }
+            
+            // Validate password
+            if (password.value.trim() === '') {
+                document.getElementById('password-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('password-error').style.display = 'none';
+            }
+            
+            if (isValid) {
+                alert('Login successful!');
+                // In a real application, you would send a login request to your server here
+            }
+        });
+    </script>
+</body>
+</html>

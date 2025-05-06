@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery DOM Update</title>
+    <!-- Include jQuery from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        .item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+        }
+        input, select {
+            padding: 8px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>jQuery DOM Update</h1>
+    
+    <!-- Example 1: Text Manipulation -->
+    <div class="container">
+        <h2>Text Manipulation</h2>
+        <p id="text-target">This text will be changed with jQuery.</p>
+        <button id="change-text">Change Text</button>
+        <button id="append-text">Append Text</button>
+        <button id="prepend-text">Prepend Text</button>
+    </div>
+    
+    <!-- Example 2: HTML Content Manipulation -->
+    <div class="container">
+        <h2>HTML Content Manipulation</h2>
+        <div id="html-target">
+            <p>This content will be modified.</p>
+        </div>
+        <button id="change-html">Change HTML</button>
+        <button id="add-list">Add List</button>
+    </div>
+    
+    <!-- Example 3: CSS Manipulation -->
+    <div class="container">
+        <h2>CSS Manipulation</h2>
+        <p id="style-target">This paragraph will have its styles changed.</p>
+        <button id="change-color">Change Color</button>
+        <button id="change-size">Change Size</button>
+        <button id="toggle-highlight">Toggle Highlight</button>
+    </div>
+    
+    <!-- Example 4: Form Manipulation -->
+    <div class="container">
+        <h2>Form Manipulation</h2>
+        <form id="sample-form">
+            <input type="text" id="input-field" placeholder="Type something..."><br>
+            <select id="select-option">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+            </select>
+        </form>
+        <div id="form-values">Form values will appear here</div>
+        <button id="get-values">Get Values</button>
+        <button id="set-values">Set Values</button>
+    </div>
+    
+    <!-- Example 5: Element Creation and Removal -->
+    <div class="container">
+        <h2>Element Creation and Removal</h2>
+        <div id="items-container">
+            <div class="item">Item 1</div>
+            <div class="item">Item 2</div>
+        </div>
+        <button id="add-item">Add Item</button>
+        <button id="remove-item">Remove Last Item</button>
+    </div>
+    
+    <!-- jQuery code will go here -->
+    <script>
+        $(document).ready(function() {
+            // Example 1: Text Manipulation
+            $('#change-text').click(function() {
+                $('#text-target').text('Text has been changed using jQuery!');
+            });
+            
+            $('#append-text').click(function() {
+                $('#text-target').append(' Appended text.');
+            });
+            
+            $('#prepend-text').click(function() {
+                $('#text-target').prepend('Prepended text. ');
+            });
+            
+            // Example 2: HTML Content Manipulation
+            $('#change-html').click(function() {
+                $('#html-target').html('<p>This is <strong>new</strong> HTML content!</p>');
+            });
+            
+            $('#add-list').click(function() {
+                $('#html-target').append('<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>');
+            });
+            
+            // Example 3: CSS Manipulation
+            $('#change-color').click(function() {
+                $('#style-target').css('color', 'red');
+            });
+            
+            $('#change-size').click(function() {
+                $('#style-target').css({
+                    'font-size': '24px',
+                    'font-weight': 'bold'
+                });
+            });
+            
+            $('#toggle-highlight').click(function() {
+                $('#style-target').toggleClass('highlight');
+            });
+            
+            // Example 4: Form Manipulation
+            $('#get-values').click(function() {
+                let inputValue = $('#input-field').val();
+                let selectValue = $('#select-option').val();
+                $('#form-values').html('Input: ' + inputValue + '<br>Select: ' + selectValue);
+            });
+            
+            $('#set-values').click(function() {
+                $('#input-field').val('New input value');
+                $('#select-option').val('option3');
+            });
+            
+            // Example 5: Element Creation and Removal
+            let itemCount = 2;
+            
+            $('#add-item').click(function() {
+                itemCount++;
+                $('#items-container').append('<div class="item">Item ' + itemCount + '</div>');
+            });
+            
+            $('#remove-item').click(function() {
+                if (itemCount > 0) {
+                    $('#items-container .item:last-child').remove();
+                    itemCount--;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

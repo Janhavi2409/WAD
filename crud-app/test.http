@@ -1,0 +1,80 @@
+# CRUD API Testing Documentation
+# This file can be used with REST Client extensions in VS Code or similar editors
+# Each request is separated by '###'
+
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### Check if API is running
+GET {{baseUrl}}
+
+### Get all items
+GET {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+### Create a new item
+POST {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+{
+    "name": "Test Item",
+    "description": "This is a test item description",
+    "category": "Testing"
+}
+
+### Create another item
+POST {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+{
+    "name": "Second Item",
+    "description": "This is another test item",
+    "category": "Sample"
+}
+
+### Get item by ID (replace the ID with an actual ID after creating an item)
+# Note: You'll need to replace this ID with one you get from a previous response
+@itemId = 6446e1fc9a7f5abcdef12345
+GET {{baseUrl}}/api/items/{{itemId}}
+Content-Type: {{contentType}}
+
+### Update an item (replace the ID with an actual ID)
+PUT {{baseUrl}}/api/items/{{itemId}}
+Content-Type: {{contentType}}
+
+{
+    "name": "Updated Item Name",
+    "description": "This description has been updated",
+    "category": "Updated"
+}
+
+### Delete an item (replace the ID with an actual ID)
+DELETE {{baseUrl}}/api/items/{{itemId}}
+Content-Type: {{contentType}}
+
+### Error testing - Get non-existent item
+GET {{baseUrl}}/api/items/nonexistentid123
+Content-Type: {{contentType}}
+
+### Error testing - Create item with missing required field
+POST {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+{
+    "description": "Item with missing name",
+    "category": "Error Test"
+}
+
+### Get all items after testing (to verify changes)
+GET {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+### Advanced: Filter items (assuming you implement this feature)
+# Example query parameter: ?category=Testing
+GET {{baseUrl}}/api/items?category=Testing
+Content-Type: {{contentType}}
+
+### Advanced: Pagination (assuming you implement this feature)
+# Example: ?page=1&limit=10
+GET {{baseUrl}}/api/items?page=1&limit=10
+Content-Type: {{contentType}}
