@@ -1,0 +1,318 @@
+=== NODE.JS CRUD API EXAM CHEAT SHEET ===
+
+# 1. PROJECT SETUP
+mkdir crud-api
+cd crud-api
+npm init -y
+npm install express mongoose dotenv cors
+npm install nodemon --save-dev
+
+# 2. FOLDER STRUCTURE
+mkdir config models routes
+touch server.js .env config/db.js models/Item.js routes/items.js
+
+# 3. ENVIRONMENT FILE (.env)
+echo "PORT=5000
+MONGO_URI=mongodb://localhost:27017/crud-api" > .env
+
+# 4. DATABASE CONNECTION (config/db.js)
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+
+# 5. ITEM MODEL (models/Item.js)
+const mongoose = require('mongoose');
+
+const ItemSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String
+  },
+  category: {
+    type: String
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+module.exports = mongoose.model('Item', ItemSchema);
+
+# 6. ROUTES (routes/items.js)
+const express = require('express');
+const router = express.Router();
+const Item = require('../models/Item');
+
+// @route   GET /api/items
+// @desc    Get all items
+// @access  Public
+router.get('/', async (req, res) => {
+  try {
+    const items = await Item.find().sort({ date: -1 });
+    res.json(items);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   GET /api/items/:id
+// @desc    Get item by ID
+// @access  Public
+router.get('/:id', async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+    
+    if (!item) {
+      return res.status(404).json({ msg: 'Item not found' });
+    }
+    
+    res.json(item);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Item not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   POST /api/items
+// @desc    Create an item
+// @access  Public
+router.post('/', async (req, res) => {
+  try {
+    const newItem = new Item({
+      name: req.body.name,
+      description: req.body.description,
+      category: req.body.category
+    });
+
+    const item = await newItem.save();
+    res.json(item);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   PUT /api/items/:id
+// @desc    Update an item
+// @access  Public
+router.put('/:id', async (req, res) => {
+  try {
+    let item = await Item.findById(req.params.id);
+    
+    if (!item) {
+      return res.status(404).json({ msg: 'Item not found' });
+    }
+    
+    // Build item object
+    const itemFields = {};
+    if (req.body.name) itemFields.name = req.body.name;
+    if (req.body.description) itemFields.description = req.body.description;
+    if (req.body.category) itemFields.category = req.body.category;
+    
+    // Update
+    item = await Item.findByIdAndUpdate(
+      req.params.id,
+      { $set: itemFields },
+      { new: true }
+    );
+    
+    res.json(item);
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Item not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+// @route   DELETE /api/items/:id
+// @desc    Delete an item
+// @access  Public
+router.delete('/:id', async (req, res) => {
+  try {
+    const item = await Item.findById(req.params.id);
+    
+    if (!item) {
+      return res.status(404).json({ msg: 'Item not found' });
+    }
+    
+    await Item.findByIdAndRemove(req.params.id);
+    
+    res.json({ msg: 'Item removed' });
+  } catch (err) {
+    console.error(err.message);
+    if (err.kind === 'ObjectId') {
+      return res.status(404).json({ msg: 'Item not found' });
+    }
+    res.status(500).send('Server Error');
+  }
+});
+
+module.exports = router;
+
+# 7. SERVER (server.js)
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const connectDB = require('./config/db');
+
+// Load environment variables
+dotenv.config();
+
+// Connect to database
+connectDB();
+
+const app = express();
+
+// Init Middleware
+app.use(express.json({ extended: false }));
+app.use(cors());
+
+// Define Routes
+app.use('/api/items', require('./routes/items'));
+
+// Simple route for testing
+app.get('/', (req, res) => {
+  res.send('API is running...');
+});
+
+// Set port
+const PORT = process.env.PORT || 5000;
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
+# 8. PACKAGE.JSON SCRIPTS
+echo '{
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  }
+}' > package.json
+
+# 9. TEST.HTTP FILE (API DOCUMENTATION)
+# CRUD API Testing Documentation
+# This file can be used with REST Client extensions in VS Code or similar editors
+# Each request is separated by '###'
+
+@baseUrl = http://localhost:5000
+@contentType = application/json
+
+### Check if API is running
+GET {{baseUrl}}
+
+### Get all items
+GET {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+### Create a new item
+POST {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+{
+    "name": "Test Item",
+    "description": "This is a test item description",
+    "category": "Testing"
+}
+
+### Create another item
+POST {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+{
+    "name": "Second Item",
+    "description": "This is another test item",
+    "category": "Sample"
+}
+
+### Get item by ID (replace the ID with an actual ID after creating an item)
+# Note: You'll need to replace this ID with one you get from a previous response
+@itemId = 6446e1fc9a7f5abcdef12345
+GET {{baseUrl}}/api/items/{{itemId}}
+Content-Type: {{contentType}}
+
+### Update an item (replace the ID with an actual ID)
+PUT {{baseUrl}}/api/items/{{itemId}}
+Content-Type: {{contentType}}
+
+{
+    "name": "Updated Item Name",
+    "description": "This description has been updated",
+    "category": "Updated"
+}
+
+### Delete an item (replace the ID with an actual ID)
+DELETE {{baseUrl}}/api/items/{{itemId}}
+Content-Type: {{contentType}}
+
+### Error testing - Get non-existent item
+GET {{baseUrl}}/api/items/nonexistentid123
+Content-Type: {{contentType}}
+
+### Error testing - Create item with missing required field
+POST {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+{
+    "description": "Item with missing name",
+    "category": "Error Test"
+}
+
+### Get all items after testing (to verify changes)
+GET {{baseUrl}}/api/items
+Content-Type: {{contentType}}
+
+### Advanced: Filter items (assuming you implement this feature)
+# Example query parameter: ?category=Testing
+GET {{baseUrl}}/api/items?category=Testing
+Content-Type: {{contentType}}
+
+### Advanced: Pagination (assuming you implement this feature)
+# Example: ?page=1&limit=10
+GET {{baseUrl}}/api/items?page=1&limit=10
+Content-Type: {{contentType}}
+
+# 10. RUN THE SERVER
+npm run dev
+
+=== QUICK REFERENCE ===
+- Endpoints:
+  GET    /api/items       - Get all items
+  GET    /api/items/:id   - Get single item
+  POST   /api/items       - Create item
+  PUT    /api/items/:id   - Update item
+  DELETE /api/items/:id   - Delete item
+
+- MongoDB Commands:
+  mongod                  - Start MongoDB server
+  mongo                   - Open MongoDB shell
+  use crud-api            - Switch to database
+
+- Testing:
+  Use test.http with REST Client
+  Replace {{itemId}} with actual ID

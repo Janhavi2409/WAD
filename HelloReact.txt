@@ -1,0 +1,87 @@
+=== REACT HELLO WORLD EXAM CHEAT SHEET ===
+
+# 1. CREATE REACT APP (Run these commands in order)
+npx create-react-app hello-react
+cd hello-react
+
+# 2. REPLACE APP COMPONENT (src/App.js)
+import React from 'react';
+import './App.css';
+
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>Hello, World!</h1>
+        <p>My first React application</p>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+
+# 3. UPDATE STYLING (src/App.css)
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+h1 {
+  margin-bottom: 0.5rem;
+}
+
+p {
+  margin-top: 0;
+}
+
+# 4. RUN THE APPLICATION
+npm start
+
+# 5. VIEW IN BROWSER
+# Automatically opens at http://localhost:3000
+# Or manually open in your browser
+
+=== KEY FILES ===
+1. src/App.js - Main component
+2. src/App.css - Component styles
+3. src/index.js - Entry point (don't modify)
+4. public/index.html - HTML template
+
+=== QUICK COMMANDS ===
+npm start    # Run development server
+Ctrl+C       # Stop server
+npm run build # Create production build
+
+=== JSX CHEATSHEET ===
+- Use className instead of class
+- Always close tags (<br/> not <br>)
+- JavaScript expressions in {}
+- Components must return single parent element
+
+=== TROUBLESHOOTING ===
+1. White screen?
+   - Check terminal for errors
+   - Verify App.js exports component
+2. Styling not working?
+   - Check classNames match in JSX/CSS
+   - Verify CSS file is imported
+3. Server not starting?
+   - Check port 3000 isn't in use
+   - Run npm install if missing dependencies
+
+=== EXTENSION IDEAS ===
+1. Add a button that changes the message
+2. Include an image from public folder
+3. Add multiple components
+4. Implement dark/light mode toggle

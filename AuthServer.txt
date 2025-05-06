@@ -1,0 +1,570 @@
+# Complete Guide to Building a Node.js Authentication Server
+
+This guide will walk you through creating a robust authentication server with Node.js from start to finish.
+
+## Table of Contents
+1. [Project Setup](#project-setup)
+2. [Installing Dependencies](#installing-dependencies)
+3. [Database Setup](#database-setup)
+4. [User Model](#user-model)
+5. [Authentication Controllers](#authentication-controllers)
+6. [Routes](#routes)
+7. [Middleware](#middleware)
+8. [Server Configuration](#server-configuration)
+9. [Testing](#testing)
+10. [Security Best Practices](#security-best-practices)
+
+## Project Setup
+
+First, let's create a new project directory and initialize our Node.js application:
+
+```bash
+# Create a project directory
+mkdir auth-server
+cd auth-server
+
+# Initialize Node.js project
+npm init -y
+```
+
+## Installing Dependencies
+
+Install the necessary packages:
+
+```bash
+# Core dependencies
+npm install express mongoose bcrypt jsonwebtoken dotenv cors helmet
+
+# Development dependencies
+npm install nodemon morgan --save-dev
+```
+
+Here's what each package does:
+- **express**: Web framework for creating the API
+- **mongoose**: MongoDB object modeling tool
+- **bcrypt**: Library for hashing passwords
+- **jsonwebtoken**: Implementation of JSON Web Tokens for authentication
+- **dotenv**: Loading environment variables
+- **cors**: Cross-Origin Resource Sharing middleware
+- **helmet**: Security headers middleware
+- **nodemon**: Auto-restart server during development
+- **morgan**: HTTP request logger
+
+## Database Setup
+
+Create a `.env` file in the project root:
+
+```
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/auth-server
+JWT_SECRET=your_jwt_secret_key_here
+JWT_EXPIRE=30d
+```
+
+## Generate JWT_SECRET
+```
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Create a database connection file at `config/database.js`:
+
+```javascript
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+```
+
+## User Model
+
+Create a user model in `models/User.js`:
+
+```javascript
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const UserSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Please add a name'],
+  },
+  email: {
+    type: String,
+    required: [true, 'Please add an email'],
+    unique: true,
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      'Please add a valid email',
+    ],
+  },
+  password: {
+    type: String,
+    required: [true, 'Please add a password'],
+    minlength: 6,
+    select: false,
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// Encrypt password using bcrypt
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Sign JWT and return
+UserSchema.methods.getSignedJwtToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
+};
+
+// Match user entered password to hashed password in database
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+module.exports = mongoose.model('User', UserSchema);
+```
+
+## Authentication Controllers
+
+Create an authentication controller in `controllers/auth.js`:
+
+```javascript
+const User = require('../models/User');
+
+// @desc    Register user
+// @route   POST /api/v1/auth/register
+// @access  Public
+exports.register = async (req, res, next) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    // Create user
+    const user = await User.create({
+      name,
+      email,
+      password,
+      role,
+    });
+
+    sendTokenResponse(user, 201, res);
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+// @desc    Login user
+// @route   POST /api/v1/auth/login
+// @access  Public
+exports.login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validate email & password
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide an email and password',
+      });
+    }
+
+    // Check for user
+    const user = await User.findOne({ email }).select('+password');
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+      });
+    }
+
+    // Check if password matches
+    const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials',
+      });
+    }
+
+    sendTokenResponse(user, 200, res);
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+// @desc    Get current logged in user
+// @route   GET /api/v1/auth/me
+// @access  Private
+exports.getMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+// @desc    Log user out / clear cookie
+// @route   GET /api/v1/auth/logout
+// @access  Private
+exports.logout = async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    data: {},
+    message: 'User logged out successfully'
+  });
+};
+
+// Get token from model, create cookie and send response
+const sendTokenResponse = (user, statusCode, res) => {
+  // Create token
+  const token = user.getSignedJwtToken();
+
+  const options = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    options.secure = true;
+  }
+
+  res.status(statusCode).json({
+    success: true,
+    token,
+  });
+};
+```
+
+## Routes
+
+Create a routes file at `routes/auth.js`:
+
+```javascript
+const express = require('express');
+const {
+  register,
+  login,
+  logout,
+  getMe,
+} = require('../controllers/auth');
+
+const router = express.Router();
+
+const { protect } = require('../middleware/auth');
+
+router.post('/register', register);
+router.post('/login', login);
+router.get('/logout', logout);
+router.get('/me', protect, getMe);
+
+module.exports = router;
+```
+
+## Middleware
+
+Create an authentication middleware in `middleware/auth.js`:
+
+```javascript
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+// Protect routes
+exports.protect = async (req, res, next) => {
+  let token;
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    // Set token from Bearer token in header
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  // Make sure token exists
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      error: 'Not authorized to access this route',
+    });
+  }
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = await User.findById(decoded.id);
+
+    next();
+  } catch (err) {
+    return res.status(401).json({
+      success: false,
+      error: 'Not authorized to access this route',
+    });
+  }
+};
+
+// Grant access to specific roles
+exports.authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        error: `User role ${req.user.role} is not authorized to access this route`,
+      });
+    }
+    next();
+  };
+};
+```
+
+## Server Configuration
+
+Create the main server file `server.js`:
+
+```javascript
+const express = require('express');
+const dotenv = require('dotenv');
+const morgan = require('morgan');
+const cors = require('cors');
+const helmet = require('helmet');
+const connectDB = require('./config/database');
+
+// Load env vars
+dotenv.config();
+
+// Connect to database
+connectDB();
+
+// Route files
+const auth = require('./routes/auth');
+
+const app = express();
+
+// Body parser
+app.use(express.json());
+
+// Dev logging middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+// Security middleware
+app.use(helmet());
+app.use(cors());
+
+// Mount routers
+app.use('/api/v1/auth', auth);
+
+const PORT = process.env.PORT || 5000;
+
+const server = app.listen(
+  PORT,
+  console.log(`Server running on port ${PORT}`)
+);
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err, promise) => {
+  console.log(`Error: ${err.message}`);
+  // Close server & exit process
+  server.close(() => process.exit(1));
+});
+```
+
+Update the package.json scripts:
+
+```json
+"scripts": {
+  "start": "node server.js",
+  "dev": "nodemon server.js"
+}
+```
+
+## Testing
+
+Create a `test.http` file to test the API endpoints:
+
+```http
+### Register User
+POST http://localhost:5000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "123456"
+}
+
+### Login User
+POST http://localhost:5000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "123456"
+}
+
+### Get Current User
+GET http://localhost:5000/api/v1/auth/me
+Authorization: Bearer YOUR_TOKEN_HERE
+
+### Logout User
+GET http://localhost:5000/api/v1/auth/logout
+Authorization: Bearer YOUR_TOKEN_HERE
+```
+
+## Security Best Practices
+
+1. **Rate Limiting**: Add rate limiting to prevent brute force attacks.
+
+```bash
+npm install express-rate-limit
+```
+
+Add to your server.js:
+
+```javascript
+const rateLimit = require('express-rate-limit');
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+// Apply to all authentication routes
+app.use('/api/v1/auth', limiter);
+```
+
+2. **Password Reset Functionality**: Add password reset functionality:
+
+```javascript
+// controllers/auth.js
+// @desc    Forgot password
+// @route   POST /api/v1/auth/forgotpassword
+// @access  Public
+exports.forgotPassword = async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: 'There is no user with that email',
+    });
+  }
+
+  // Get reset token
+  const resetToken = user.getResetPasswordToken();
+
+  await user.save({ validateBeforeSave: false });
+
+  // Create reset url
+  const resetUrl = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/auth/resetpassword/${resetToken}`;
+
+  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+
+  try {
+    // Send email with reset token (implementation depends on your email service)
+    // await sendEmail({ to: user.email, subject: 'Password reset token', text: message });
+
+    res.status(200).json({ success: true, data: 'Email sent' });
+  } catch (err) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    return res.status(500).json({
+      success: false,
+      error: 'Email could not be sent',
+    });
+  }
+};
+```
+
+3. **Add HTTPS**: In production, ensure your server uses HTTPS.
+
+4. **Implement Two-Factor Authentication**: Consider adding 2FA for additional security.
+
+5. **Security Headers**: Already implemented with helmet middleware.
+
+## Final Project Structure
+
+Your project should now have the following structure:
+
+```
+auth-server/
+├── config/
+│   └── database.js
+├── controllers/
+│   └── auth.js
+├── middleware/
+│   └── auth.js
+├── models/
+│   └── User.js
+├── routes/
+│   └── auth.js
+├── .env
+├── package.json
+├── server.js
+└── test.http
+```
+
+To start the server:
+
+```bash
+# Development mode with auto-restart
+npm run dev
+
+# Production mode
+npm start
+```
+
+Your authentication server is now complete and ready for use. It includes user registration, login, authentication, and protected routes.

@@ -1,0 +1,190 @@
+=== NODE.JS HTTP SERVER EXAM CHEAT SHEET ===
+
+1. SETUP PROJECT:
+mkdir node-server
+cd node-server
+npm init -y
+
+2. CREATE SERVER FILE (server.js):
+// Import the HTTP module
+const http = require('http');
+
+// Define the hostname and port
+const hostname = '127.0.0.1';
+const port = 3000;
+
+// Create the server
+const server = http.createServer((req, res) => {
+  // Handle different routes
+  const url = req.url;
+  
+  if (url === '/') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html');
+    res.end(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Node.js HTTP Server</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            h1 { color: #333; }
+            nav { margin-bottom: 20px; }
+            nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+            nav a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <h1>Welcome to my Node.js Server</h1>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+          </nav>
+          <p>This is the home page of our simple HTTP server created with Node.js.</p>
+        </body>
+      </html>
+    `);
+  } 
+  else if (url === '/about') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html');
+    res.end(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>About - Node.js HTTP Server</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            h1 { color: #333; }
+            nav { margin-bottom: 20px; }
+            nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+            nav a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <h1>About Page</h1>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+          </nav>
+          <p>This is the About page of our simple HTTP server.</p>
+        </body>
+      </html>
+    `);
+  } 
+  else if (url === '/contact') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html');
+    res.end(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Contact - Node.js HTTP Server</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            h1 { color: #333; }
+            nav { margin-bottom: 20px; }
+            nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+            nav a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <h1>Contact Page</h1>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+          </nav>
+          <p>This is the Contact page of our simple HTTP server.</p>
+        </body>
+      </html>
+    `);
+  } 
+  else {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/html');
+    res.end(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>404 - Page Not Found</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+            h1 { color: #d9534f; }
+            nav { margin-bottom: 20px; }
+            nav a { margin-right: 15px; color: #0066cc; text-decoration: none; }
+            nav a:hover { text-decoration: underline; }
+          </style>
+        </head>
+        <body>
+          <h1>404 - Page Not Found</h1>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+          </nav>
+          <p>The page you requested could not be found.</p>
+        </body>
+      </html>
+    `);
+  }
+});
+
+// Start the server
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
+
+3. RUN SERVER:
+node server.js
+
+4. TEST IN BROWSER:
+Open http://127.0.0.1:3000/
+
+5. ADD ROUTES (Edit server.js):
+echo "const http = require('http');
+
+const hostname = '127.0.0.1';
+const port = 3000;
+
+const server = http.createServer((req, res) => {
+  const url = req.url;
+  
+  if (url === '/') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html');
+    res.end('<h1>Home Page</h1>');
+  } 
+  else if (url === '/about') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/html');
+    res.end('<h1>About Page</h1>');
+  }
+  else {
+    res.statusCode = 404;
+    res.end('404 Not Found');
+  }
+});
+
+server.listen(port, hostname, () => {
+  console.log('Server running at http://' + hostname + ':' + port + '/');
+});" > server.js
+
+6. RESTART SERVER:
+Ctrl+C (to stop)
+node server.js
+
+7. TEST ROUTES:
+http://127.0.0.1:3000/
+http://127.0.0.1:3000/about
+http://127.0.0.1:3000/anything
+
+=== QUICK REFERENCE ===
+To create file: echo "[code]" > filename.js
+To run: node filename.js
+To stop server: Ctrl+C
+To edit file: nano filename.js (or use your preferred editor)
+
+Port numbers you can use: 3000, 8080, 8000

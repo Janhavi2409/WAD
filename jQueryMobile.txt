@@ -1,0 +1,300 @@
+=== JQUERY MOBILE EXAM CHEAT SHEET ===
+
+# 1. PROJECT SETUP
+mkdir jquery-mobile-project
+cd jquery-mobile-project
+mkdir css js
+
+# 2. CREATE INDEX.HTML
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My jQuery Mobile Site</title>
+    
+    <!-- jQuery and jQuery Mobile CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.4.5/jquery.mobile.min.css">
+    
+    <!-- Custom CSS (optional) -->
+    <link rel="stylesheet" href="css/custom.css">
+    
+    <!-- jQuery and jQuery Mobile JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-mobile/1.4.5/jquery.mobile.min.js"></script>
+    
+    <!-- Custom JS (optional) -->
+    <script src="js/custom.js"></script>
+</head>
+<body>
+    <!-- Home Page -->
+    <div data-role="page" id="home">
+        <!-- Header -->
+        <div data-role="header">
+            <h1>My jQuery Mobile App</h1>
+            <a href="#panel" class="ui-btn ui-btn-left ui-icon-bars ui-btn-icon-notext">Menu</a>
+        </div>
+        
+        <!-- Panel Menu -->
+        <div data-role="panel" id="panel" data-display="overlay">
+            <ul data-role="listview">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="#" data-rel="close" class="ui-btn ui-btn-inline ui-shadow ui-corner-all">Close</a>
+        </div>
+        
+        <!-- Content -->
+        <div role="main" class="ui-content">
+            <h2>Welcome to my jQuery Mobile site!</h2>
+            <p>This is a simple example of a jQuery Mobile website.</p>
+            
+            <!-- Button example -->
+            <a href="#about" class="ui-btn ui-btn-inline ui-corner-all">About Us</a>
+            <a href="#contact" class="ui-btn ui-btn-inline ui-corner-all ui-btn-b">Contact Us</a>
+            
+            <!-- List example -->
+            <ul data-role="listview" data-inset="true">
+                <li data-role="list-divider">Featured Content</li>
+                <li><a href="#">Item 1</a></li>
+                <li><a href="#">Item 2</a></li>
+                <li><a href="#">Item 3</a></li>
+            </ul>
+            
+            <!-- Form example -->
+            <form>
+                <div class="ui-field-contain">
+                    <label for="name">Name:</label>
+                    <input type="text" name="name" id="name">
+                </div>
+                <div class="ui-field-contain">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email">
+                </div>
+                <input type="submit" value="Submit" data-theme="b">
+            </form>
+        </div>
+        
+        <!-- Footer -->
+        <div data-role="footer">
+            <h4>&copy; 2025 My jQuery Mobile Site</h4>
+        </div>
+    </div>
+    
+    <!-- About Page -->
+    <div data-role="page" id="about">
+        <div data-role="header">
+            <a href="#home" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a>
+            <h1>About Us</h1>
+        </div>
+        <div role="main" class="ui-content">
+            <h2>About Our Company</h2>
+            <p>This is the about page with information about our company.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit, vulputate eu pharetra nec, mattis ac neque.</p>
+        </div>
+        <div data-role="footer">
+            <h4>&copy; 2025 My jQuery Mobile Site</h4>
+        </div>
+    </div>
+    
+    <!-- Contact Page -->
+    <div data-role="page" id="contact">
+        <div data-role="header">
+            <a href="#home" class="ui-btn ui-icon-home ui-btn-icon-left">Home</a>
+            <h1>Contact Us</h1>
+        </div>
+        <div role="main" class="ui-content">
+            <h2>Get in Touch</h2>
+            <p>Here's how you can contact us:</p>
+            <ul data-role="listview" data-inset="true">
+                <li>Email: info@example.com</li>
+                <li>Phone: (123) 456-7890</li>
+                <li>Address: 123 Mobile St, Web City</li>
+            </ul>
+            
+            <form>
+                <h3>Send us a message</h3>
+                <div class="ui-field-contain">
+                    <label for="contact-name">Name:</label>
+                    <input type="text" name="contact-name" id="contact-name">
+                </div>
+                <div class="ui-field-contain">
+                    <label for="contact-email">Email:</label>
+                    <input type="email" name="contact-email" id="contact-email">
+                </div>
+                <div class="ui-field-contain">
+                    <label for="message">Message:</label>
+                    <textarea name="message" id="message"></textarea>
+                </div>
+                <input type="submit" value="Send Message" data-theme="b">
+            </form>
+        </div>
+        <div data-role="footer">
+            <h4>&copy; 2025 My jQuery Mobile Site</h4>
+        </div>
+    </div>
+</body>
+</html>
+
+# 3. CUSTOM CSS (css/custom.css)
+/* Custom styling for your jQuery Mobile site */
+
+/* Custom header style */
+.ui-header {
+    background-color: #3498db !important;
+}
+
+.ui-header h1 {
+    color: white !important;
+}
+
+/* Custom footer style */
+.ui-footer {
+    background-color: #2c3e50 !important;
+    color: white !important;
+}
+
+/* Custom content styles */
+.ui-content h2 {
+    color: #3498db;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Enhance form elements */
+.ui-input-text, .ui-textarea {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+/* Custom button hover effect */
+.ui-btn:hover {
+    opacity: 0.9;
+}
+
+/* Custom panel styling */
+#panel {
+    background-color: #f8f9fa !important;
+}
+
+#panel ul {
+    margin-top: 20px;
+}
+
+/* Custom list styling */
+.ui-listview {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .ui-content {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+}
+
+# 4. CUSTOM JS (js/custom.js)
+$(document).ready(function() {
+    // This will run when the document is ready
+    console.log("jQuery Mobile site is ready!");
+    
+    // Initialize any custom components or functionality
+    
+    // Example: Adding a click handler to form submission
+    $("form").on("submit", function(event) {
+        // Prevent the default form submission
+        event.preventDefault();
+        
+        // Get form values
+        var formData = $(this).serialize();
+        console.log("Form data:", formData);
+        
+        // Show a confirmation message
+        alert("Thanks for your submission!");
+        
+        // Reset the form
+        this.reset();
+        
+        // In a real app, you would send the data to a server here
+        // $.ajax({
+        //     url: "your-server-endpoint",
+        //     method: "POST",
+        //     data: formData,
+        //     success: function(response) {
+        //         console.log("Server response:", response);
+        //     }
+        // });
+    });
+    
+    // Example: Add a theme switcher
+    $("#home").on("pageshow", function() {
+        // Add a theme switcher button to the home page
+        if ($("#theme-switcher").length === 0) {
+            $("<a>")
+                .attr("id", "theme-switcher")
+                .text("Switch Theme")
+                .addClass("ui-btn ui-corner-all ui-shadow ui-btn-inline")
+                .appendTo("#home .ui-content")
+                .on("click", function() {
+                    // Toggle between theme a and b
+                    $("body").toggleClass("ui-page-theme-a ui-page-theme-b");
+                    
+                    // Change button text based on current theme
+                    if ($("body").hasClass("ui-page-theme-b")) {
+                        $(this).text("Light Theme");
+                    } else {
+                        $(this).text("Dark Theme");
+                    }
+                });
+        }
+    });
+    
+    // Example: Add a page transition effect
+    $(document).on("pagecontainerbeforeshow", function(event, ui) {
+        var toPage = ui.toPage;
+        
+        // Add a subtle animation to page elements when showing a new page
+        $(toPage).find(".ui-content").hide().fadeIn(500);
+    });
+});
+
+# 5. RUN PROJECT
+# Simply open index.html in any browser
+
+=== KEY COMPONENTS ===
+1. Page Structure:
+   - Each "page" is a div with data-role="page"
+   - Contains:
+     * Header (data-role="header")
+     * Content (role="main" class="ui-content")
+     * Footer (data-role="footer")
+
+2. Navigation:
+   - Link to pages using href="#pageid"
+   - Back buttons: ui-btn-left with ui-icon-home
+
+3. UI Elements:
+   - Buttons: <a class="ui-btn">
+   - Lists: <ul data-role="listview">
+   - Forms: Standard form elements with data-role="none" to disable JQM styling
+
+=== QUICK REFERENCE ===
+- Themes: data-theme="a" (default) through "b"
+- Icons: ui-icon-[name] (home, arrow-l, gear, etc.)
+- Transitions: data-transition="slide" (pop, fade, flip)
+
+=== TESTING ===
+1. Desktop: Open index.html directly
+2. Mobile:
+   - Use local server: python3 -m http.server 8000
+   - Access via http://[your-ip]:8000 on mobile device
+   - Or use browser dev tools device emulation
+
+=== DEPLOYMENT ===
+1. Upload all files to any web host
+2. No server-side code needed (static files only)
+3. For GitHub Pages:
+   - Create repo
+   - Push files
+   - Enable in repo settings

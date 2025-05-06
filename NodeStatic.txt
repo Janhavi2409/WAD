@@ -1,0 +1,286 @@
+=== NODE.JS STATIC WEBSITE EXAM CHEAT SHEET ===
+
+# 1. PROJECT SETUP
+mkdir my-static-site
+cd my-static-site
+npm init -y
+
+# 2. CREATE FOLDER STRUCTURE
+mkdir -p public/{css,js,images}
+New-Item -Path "public/index.html" -ItemType File
+New-Item -Path "public/css/style.css" -ItemType File
+New-Item -Path "public/js/main.js" -ItemType File
+New-Item -Path "server.js" -ItemType File
+
+# 3. BASIC FILES (run these commands one by one)
+
+# public/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Static Website</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>Welcome to My Static Website</h1>
+            <p>This is a sample static website created with Node.js</p>
+        </section>
+
+        <section class="content">
+            <h2>Features</h2>
+            <ul>
+                <li>Fast loading times</li>
+                <li>Easy to deploy</li>
+                <li>Scalable architecture</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 My Static Website. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
+
+# public/css/style.css
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Navigation */
+header {
+    background-color: #333;
+    padding: 1rem 0;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+}
+
+nav ul li {
+    margin: 0 1rem;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Main Content */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.content {
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.content h2 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.content ul {
+    margin-left: 2rem;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 1rem;
+    background-color: #333;
+    color: white;
+    margin-top: 2rem;
+}
+
+# public/js/main.js
+// Wait for the DOM to load
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Website loaded successfully!');
+    
+    // Example JavaScript functionality
+    const currentYear = new Date().getFullYear();
+    const footerYear = document.querySelector('footer p');
+    
+    if (footerYear) {
+        footerYear.innerHTML = footerYear.innerHTML.replace('2025', currentYear);
+    }
+    
+    // Add a simple animation to the hero section
+    const hero = document.querySelector('.hero');
+    if (hero) {
+        hero.style.opacity = '0';
+        hero.style.transition = 'opacity 1s ease-in-out';
+        
+        setTimeout(() => {
+            hero.style.opacity = '1';
+        }, 300);
+    }
+});
+
+# server.js
+const express = require('express');
+const path = require('path');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// For any other routes, serve index.html (optional - for single page applications)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+# 5. INSTALL DEPENDENCIES
+npm install express
+npm install nodemon --save-dev
+
+# 6. UPDATE PACKAGE.JSON
+echo '{
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  }
+}' > package.json
+
+# 7. ADDITIONAL PAGES (OPTIONAL)
+echo '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/about.html">About</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </header>
+    <main>
+        <h1>About Us</h1>
+    </main>
+</body>
+</html>' > public/about.html
+
+echo '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Contact</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/about.html">About</a>
+            <a href="/contact.html">Contact</a>
+        </nav>
+    </header>
+    <main>
+        <h1>Contact Us</h1>
+        <form>
+            <input type="text" placeholder="Name">
+            <input type="email" placeholder="Email">
+            <textarea placeholder="Message"></textarea>
+            <button type="submit">Send</button>
+        </form>
+    </main>
+</body>
+</html>' > public/contact.html
+
+# 8. RUN THE SITE
+npm run dev  # Development (auto-reload)
+# OR
+npm start    # Production
+
+# 9. ACCESS IN BROWSER
+Open http://localhost:3000
+
+# 10. DEPLOYMENT (OPTIONAL)
+# For Heroku:
+echo "web: node server.js" > Procfile
+git init
+echo "node_modules/" > .gitignore
+git add .
+git commit -m "Initial commit"
+heroku create
+git push heroku main
+
+=== QUICK REFERENCE ===
+- Project structure:
+  public/
+    css/style.css
+    js/main.js
+    images/
+    index.html
+    about.html
+    contact.html
+  server.js
+  package.json
+
+- Key commands:
+  npm init -y       # Initialize project
+  npm install express  # Add web server
+  npm run dev      # Dev server with auto-reload
+  npm start        # Production server
+
+- Access files:
+  /           -> index.html
+  /about.html -> about page
+  /contact.html -> contact page

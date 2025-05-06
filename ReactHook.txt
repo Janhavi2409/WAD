@@ -1,0 +1,162 @@
+=== REACT HOOKS COUNTER APP EXAM CHEAT SHEET ===
+
+# 1. CREATE REACT APP
+npx create-react-app counter-app
+cd counter-app
+
+# 2. CLEAN UP BOILERPLATE
+# Remove all files in src/ except App.js, index.js, and App.css
+rm src/logo.svg src/reportWebVitals.js src/setupTests.js
+
+# 3. CREATE COUNTER COMPONENT (App.js)
+import React, { useState } from 'react';
+import './App.css';
+
+function App() {
+  // useState hook - initializing count state with value of 0
+  const [count, setCount] = useState(0);
+  
+  // Function to increment count
+  const increment = () => {
+    setCount(count + 1);
+  };
+  
+  // Function to decrement count
+  const decrement = () => {
+    setCount(count - 1);
+  };
+  
+  // Function to reset count
+  const reset = () => {
+    setCount(0);
+  };
+
+  return (
+    <div className="App">
+      <h1>Counter App with useState Hook</h1>
+      <div className="counter-container">
+        <h2>Current Count: {count}</h2>
+        <div className="button-container">
+          <button onClick={decrement}>Decrement</button>
+          <button onClick={reset}>Reset</button>
+          <button onClick={increment}>Increment</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
+# 4. ADD BASIC STYLING (App.css)
+.App {
+  text-align: center;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 30px;
+}
+
+.counter-container {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  color: #3498db;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:nth-child(1) {
+  background-color: #e74c3c;
+  color: white;
+}
+
+button:nth-child(2) {
+  background-color: #7f8c8d;
+  color: white;
+}
+
+button:nth-child(3) {
+  background-color: #2ecc71;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+# 5. RUN THE APPLICATION
+npm start
+
+# 6. TEST THE APP
+# - Should display "Current Count: 0" initially
+# - Increment button increases count by 1
+# - Decrement button decreases count by 1
+# - Reset button sets count back to 0
+
+=== KEY CONCEPTS ===
+1. useState Hook:
+   - const [state, setState] = useState(initialValue);
+   - Used to manage local component state
+   - Returns current state and updater function
+
+2. Event Handling:
+   - onClick={functionName}
+   - Arrow functions commonly used for callbacks
+
+3. JSX Syntax:
+   - HTML-like syntax in JavaScript
+   - Use {} to embed JavaScript expressions
+   - className instead of class
+
+=== QUICK REFERENCE ===
+- Project structure:
+  counter-app/
+    src/
+      App.js       # Main component
+      App.css      # Component styles
+      index.js     # Entry point
+    public/        # Static files
+    package.json   # Dependencies
+
+- Common commands:
+  npm start       # Run development server
+  npm run build   # Create production build
+  npm test        # Run tests
+
+- Hooks pattern:
+  1. Import: import { useState } from 'react';
+  2. Initialize: const [value, setValue] = useState(initial);
+  3. Use: {value} in JSX
+  4. Update: setValue(newValue) in event handlers
+
+=== EXTENSION IDEAS ===
+1. Add useEffect to save count to localStorage
+2. Create custom useCounter hook
+3. Add maximum/minimum limits
+4. Implement step increment/decrement
+5. Add theme switching with useContext
